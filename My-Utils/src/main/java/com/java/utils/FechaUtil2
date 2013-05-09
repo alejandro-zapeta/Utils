@@ -1,0 +1,139 @@
+package gt.com.gyt.emisor.express.web.util;
+
+import groovyjarjarcommonscli.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+/**
+ *
+ * @author jcano
+ */
+public class FechaUtil {
+
+    public static final SimpleDateFormat FORMAT_DATE = new SimpleDateFormat("dd/MM/yyyy");
+    public static final SimpleDateFormat FORMAT_YEAR = new SimpleDateFormat("yyyy");
+//    public static final SimpleDateFormat FORMAT_DATE = new SimpleDateFormat("dd/MM/yyyy");
+    private static final long MS_YEAR = 1000L * 60 * 60 * 24 * 365;
+    private static final Calendar calendar = Calendar.getInstance();
+
+    public static boolean isInTheRange(Short ini, Short fin, Short age) {
+        if ((age.intValue() >= ini.intValue()) && (age.intValue() <= fin.intValue())) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isNotTheRange(Short ini, Short fin, Short age) {
+        return !isInTheRange(ini, fin, age);
+    }
+
+    public static Short getEdadByFechaNacimiento(Date fechaNacimiento) {
+        if (fechaNacimiento == null) {
+            return null;
+        }
+        Short edad;
+
+        int res = getNumberOfYears(new Date(), fechaNacimiento);
+        edad = (short) res;
+
+        return edad;
+    }
+
+    public static int getNumberOfYears(Date fini, Date ffin) {
+        if (fini == null || ffin == null) {
+            return -1;
+        }
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(fini);
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(ffin);
+
+        long msDiff = c1.getTimeInMillis() - c2.getTimeInMillis();
+        long result = msDiff / MS_YEAR;
+        return (int) result;
+    }
+
+    public static XMLGregorianCalendar convertirFecha(String fechaString, String formato) throws ParseException, DatatypeConfigurationException, java.text.ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(formato);
+        Date fechaDate = sdf.parse(fechaString);
+        return convertirFecha(fechaDate);
+    }
+
+    public static XMLGregorianCalendar convertirFecha(Date fecha) throws DatatypeConfigurationException {
+        if (fecha != null) {
+            GregorianCalendar gc = new GregorianCalendar();
+            gc.setTime(fecha);
+            XMLGregorianCalendar retorno = DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
+            return retorno;
+        }
+        return null;
+    }
+
+    public static XMLGregorianCalendar convetirFechaCorrecta(Date fecha) throws DatatypeConfigurationException {
+        GregorianCalendar gcal = (GregorianCalendar) GregorianCalendar.getInstance();
+        gcal.setTime(fecha);
+        XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
+        return xgcal;
+    }
+
+    public static Date convertirFecha(XMLGregorianCalendar fecha) {
+        if (fecha != null) {
+            return fecha.toGregorianCalendar().getTime();
+        }
+        return null;
+    }
+
+    public static Date convertirStringToFecha(String fechaString, String formato) throws ParseException, DatatypeConfigurationException, java.text.ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(formato);
+        Date fechaDate = sdf.parse(fechaString);
+        return fechaDate;
+    }
+
+    public static Date sumOneYearFromDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        if (date != null) {
+            cal.add(Calendar.YEAR, 1);
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+        }
+        return cal.getTime();
+    }
+
+    public static Date sumOneMonthFromDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        if (date != null) {
+            cal.add(Calendar.MONTH, 1);
+        }
+        return cal.getTime();
+    }
+
+    public static int validarFechaAnual(Date fechaInicio, Date fechaFin) {
+        if (fechaInicio != null && fechaFin != null) {
+            return (int) ((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
+        }
+        return 0;
+    }
+
+    public static Date format(String str) {
+        if (str == null) {
+            return null;
+        }
+        Date result = null;
+        try {
+            result = FORMAT_DATE.parse(str);
+        } catch (java.text.ParseException ex) {
+            return null;
+        }
+        return result;
+    }
+
+    public static String format(Date fecha) {
+        return FORMAT_DATE.format(fecha);
+    }
+}
